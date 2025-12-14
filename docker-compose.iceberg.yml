@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  iceberg-rest:
+    image: tabulario/iceberg-rest:latest
+    container_name: iceberg-rest
+    environment:
+      # Use a plain filesystem path (no URI scheme) to avoid client path parsing issues.
+      CATALOG_WAREHOUSE: /warehouse
+    ports:
+      - "8181:8181"
+    volumes:
+      - /warehouse:/warehouse

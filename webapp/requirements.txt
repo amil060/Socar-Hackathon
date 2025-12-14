@@ -1,0 +1,2 @@
+streamlit==1.38.0
+psutil==6.0.0

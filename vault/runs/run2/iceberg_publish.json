@@ -1,0 +1,24 @@
+{
+  "pipeline_run_id": "run2",
+  "git_commit": "unknown",
+  "ingest_dts_utc": "2025-12-14T07:54:52.815529+00:00",
+  "tables": [
+    {
+      "table_name": "mart_sensor_analysis",
+      "snapshot_id": null,
+      "published_at_utc": "2025-12-14T07:54:52.669040+00:00"
+    },
+    {
+      "table_name": "mart_survey_summary",
+      "snapshot_id": null,
+      "published_at_utc": "2025-12-14T07:54:52.741075+00:00"
+    },
+    {
+      "table_name": "mart_well_performance",
+      "snapshot_id": null,
+      "published_at_utc": "2025-12-14T07:54:52.814065+00:00"
+    }
+  ],
+  "iceberg_endpoint": "http://localhost:8181",
+  "namespace": "sumba101"
+}

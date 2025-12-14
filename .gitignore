@@ -1,0 +1,46 @@
+# outputs / large data
+processed_data/
+data/
+snapshots/
+*.parquet
+*.sgx
+*.zip
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# airflow logs
+airflow/logs/
+
+# OS
+.DS_Store
+
+# Linux home noise
+.bash*
+.profile
+.python_history
+.wget-hsts
+.sudo_as_admin_successful
+
+# SSH & credentials
+.ssh/
+
+# caches
+.cache/
+.local/
+.vscode-server/
+.ipynb_checkpoints/
+
+# logs & runtime
+logs/
+*.log
+*.pid
+.streamlit/
+.duckdb/
+
+# airflow runtime
+airflow/logs/
+
