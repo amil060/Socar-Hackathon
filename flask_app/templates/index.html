@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SumBa 101 | Pipeline Launcher</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h2>SumBa 101<br>Data Pipeline Launcher</h2>
+
+    <form method="post">
+        <label>Dataset Directory</label>
+        <input type="text" name="data_dir" value="/home/hackathon/data">
+        <button type="submit">Run Pipeline</button>
+    </form>
+
+    {% if message %}
+        <div class="status">{{ message }}</div>
+    {% endif %}
+
+    <div class="links">
+        <a href="http://<VM-IP>:80" target="_blank">Airflow</a>
+        <a href="http://<VM-IP>:8080" target="_blank">Dashboard</a>
+    </div>
+
+    <div class="footer">
+        SOCAR Hackathon 2025 • Team SumBa 101
+    </div>
+</div>
+
+</body>
+</html>

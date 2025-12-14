@@ -1,267 +1,176 @@
 SOCAR Hackathon 2025 – SumBa 101
-Data Engineering Track – Full Project Documentation
+Data Engineering Track
 
-This repository documents the full data engineering solution developed by Team SumBa 101 for SOCAR Hackathon 2025.
-The project demonstrates a production-style data pipeline handling corrupted data, legacy binary formats, analytical modeling, orchestration, and visualization — all running on the provided hackathon virtual machine.
+This project presents a production-style end-to-end data platform developed for SOCAR Hackathon 2025 by Team SumBa 101.
+The solution demonstrates how raw and legacy datasets can be processed through a full ETL lifecycle — from ingestion and recovery to analytics — using modern data engineering tools.
 
-1. Project Goal
+The entire system runs on the provided hackathon virtual machine and strictly follows the competition guidelines.
 
-The main objective of this project is to:
+🎯 Project Objective
 
-Process raw and corrupted datasets
+The main objective is to build a single web-based entry point from which:
 
-Recover hidden or damaged parquet files
+A dataset directory is selected (no file upload)
 
-Parse legacy SGX seismic binary files
+The complete ETL pipeline is executed
 
-Transform raw data into a Data Vault model
+Data flows through recovery, parsing, Data Vault, and marts
 
-Build analytical data marts
+Orchestration is handled via Airflow
 
-Orchestrate the entire pipeline using Airflow
+Analytical results are exposed through a dashboard
 
-Provide a web-based pipeline launcher and analytics dashboard
+Links to Airflow and the dashboard are provided to the user
 
-The solution is designed to be scalable, modular, and fully reproducible.
+🏗️ System Architecture
+User (Browser)
+      |
+      v
+Flask Web Application (HTML + CSS)
+      |
+      v
+ETL Pipeline (Bash + Python)
+      |
+      +--> Parquet Recovery
+      +--> SGX → Parquet Conversion
+      +--> Data Vault Modeling
+      +--> Dimensional Marts
+      |
+      v
+Airflow Orchestration
+      |
+      v
+Analytics Dashboard (Streamlit)
 
-2. High-Level Architecture
+🧰 Technologies Used
 
-The system follows a layered enterprise data architecture:
+Python 3 – core data processing
 
-Raw Data Sources
-(.parquet, .sgx)
-        |
-        v
-Recovery & Parsing Layer
-- Corrupted parquet recovery
-- SGX binary parsing
-        |
-        v
-Raw Data Vault
-- Hubs
-- Links
-- Satellites
-        |
-        v
-Dimensional Models / Data Marts
-        |
-        v
-Analytics & Visualization
-        |
-        v
-Airflow Orchestration + Web Pipeline Launcher
+Bash – ETL orchestration scripts
 
-3. Technologies Used
-Core Technologies
+Flask – lightweight pipeline web application
 
-Python 3 – main data processing language
+HTML & CSS – web UI design
 
-Bash – pipeline automation and hackathon-required scripts
-
-Parquet – columnar storage format
-
-DuckDB – analytical processing
-
-Apache Iceberg – table abstraction for marts
-
-Docker & Docker Compose – Airflow deployment
-
-Streamlit – web application & dashboard
+Streamlit – analytics dashboard
 
 Apache Airflow – pipeline orchestration
 
-Data Modeling
+Docker & Docker Compose – Airflow deployment
 
-Data Vault 2.0
+Parquet – columnar data storage
 
-Hubs (business keys)
+DuckDB / Iceberg – analytical data processing
 
-Links (relationships)
+Data Vault 2.0 – data modeling methodology
 
-Satellites (descriptive attributes)
+🌐 Web Application (Pipeline Launcher)
 
-4. Raw Data Handling
-4.1 Corrupted Parquet Files
+A lightweight Flask-based web application serves as the main user interface.
 
-Some parquet files were intentionally corrupted with oversized footers and hidden binary content.
+Key Features
 
-We implemented:
+No dataset upload (directory-based processing for large datasets)
 
-A parquet repair script that:
+One-click pipeline execution
 
-Detects corrupted metadata
+Clean and modern UI (HTML + CSS)
 
-Extracts valid row groups
+Provides direct links to:
 
-Recovers embedded information
+Airflow UI
 
-Output is written to:
+Analytics Dashboard
 
-processed_data/
+Port: 5000
 
+Path:
 
-Script:
+/home/hackathon/flask_app/
+
+🔁 ETL Pipeline Flow
+
+The pipeline is executed via a single runner script and consists of the following stages:
+
+1. Parquet Recovery
+
+Repairs corrupted parquet files and recovers hidden metadata.
 
 solutions/corrupted_parquet.sh --data-dir <DATA_DIR>
 
-4.2 SGX Legacy Binary Files
+2. SGX → Parquet Conversion
 
-SGX files are legacy seismic binary files containing structured records.
-
-We implemented:
-
-A custom SGX parser in Python
-
-Binary decoding using struct
-
-Conversion of SGX traces into structured parquet format
-
-Script:
+Parses legacy SGX binary seismic files into parquet format.
 
 python src/sgx_to_parquet.py --data-dir <DATA_DIR> --out-dir <OUT_DIR>
 
+3. Data Vault Modeling
 
-Output:
-
-processed_data/sgx_traces.parquet
-
-5. Data Vault Implementation
-
-After parsing and recovery, the data is transformed into a Raw Data Vault model.
-
-Vault Components
-
-Hubs
-
-hub_well
-
-hub_sensor
-
-hub_survey
-
-Links
-
-link_well_sensor_survey
-
-Satellites
-
-sat_readings
-
-Vault build scripts:
+Transforms data into Raw Data Vault structures (Hubs, Links, Satellites).
 
 solutions/build_vault.sh --data-dir <DATA_DIR>
 
 
-Output structure:
+Outputs:
 
 processed_data/dv/
   hub_*.parquet
   link_*.parquet
   sat_*.parquet
 
+4. Analytical Marts
 
-Snapshots of vault states are stored under:
-
-snapshots/<timestamp>/
-
-6. Analytical Data Marts
-
-From the Data Vault layer, analytical marts are created:
-
-Star-schema style fact and dimension tables
-
-Optimized for analytical queries
-
-Published using DuckDB and Iceberg-compatible layouts
-
-Script:
+Creates analytical, query-optimized marts.
 
 python scripts/iceberg_publish.py
 
+⏱️ Airflow Orchestration
 
-Output example:
+Airflow is deployed using Docker Compose
 
-mart_sensor_analysis/
+A custom DAG executes the same pipeline used by the web app
 
-7. Web Application – Pipeline Launcher
+Supports monitoring, retries, and logging
 
-To simplify execution and demonstrate usability, we built a web-based pipeline launcher.
-
-Key Features
-
-Built with Streamlit
-
-No dataset upload (supports very large datasets)
-
-User inputs a directory path
-
-Runs full pipeline end-to-end
-
-Displays real-time logs
-
-Port:
-
-8090
-
-
-Path:
-
-/home/hackathon/webapp/
-
-
-Pipeline execution is handled by:
-
-webapp/scripts/run_pipeline.sh
-
-8. Airflow Orchestration
-
-The pipeline is orchestrated using Apache Airflow, deployed via Docker Compose.
-
-Features
-
-DAG triggers the same pipeline used by the web app
-
-Manual triggering with custom parameters
-
-Centralized scheduling and monitoring
-
-DAG:
-
-airflow/dags/sumba_pipeline_dag.py
-
+DAG Name: sumba_pipeline
+Port: 80
 
 Trigger example:
 
 docker-compose exec airflow-webserver airflow dags trigger sumba_pipeline \
   --conf '{"data_dir":"/home/hackathon/data"}'
 
+📊 Analytics Dashboard
 
-Port:
+Built with Streamlit
 
-80
+Reads processed marts and vault outputs
 
-9. Analytics Dashboard
+Automatically reflects newly processed datasets
 
-An analytics dashboard was built using Streamlit to visualize results from the marts.
+Port: 8080
 
-Features:
-
-Interactive charts
-
-Aggregated sensor and survey analytics
-
-Reads directly from processed data
-
-Port:
-
-8080
-
-10. Ports Overview
+🔌 Ports Summary
 Component	Port
-Airflow Web UI	80
-Analytics Dashboard	8080
-Web Pipeline Launcher	8090
-11. Repository & Directory Structure
+Airflow UI	80
+Dashboard	8080
+Web App (Flask)	5000
+▶️ How to Run
+Activate environment
+source /home/hackathon/venv/bin/activate
+
+Start Web Application
+cd /home/hackathon/flask_app
+nohup python app.py > flask.log 2>&1 &
+
+Start Airflow
+cd /home/hackathon/airflow
+docker-compose restart
+
+Start Dashboard
+streamlit run /home/hackathon/dashboard.py --server.port 8080
+
+📁 Repository Structure
 solutions/
   corrupted_parquet.sh
   flag_parquet.sh
@@ -271,72 +180,49 @@ solutions/
 src/
   sgx_to_parquet.py
   dv/
-    build_hubs.py
-    build_links.py
-    build_sats.py
 
-webapp/
+flask_app/
   app.py
-  scripts/run_pipeline.sh
+  templates/
+  static/
 
 airflow/
   dags/sumba_pipeline_dag.py
 
-processed_data/
-snapshots/
 README.md
 
-12. Hackathon Requirements Compliance
+✅ Hackathon Compliance
 
-✔ Uses provided virtual machine
+✔ Uses provided VM
 
 ✔ No large file uploads
 
-✔ Bash scripts accept --data-dir
+✔ Scripts accept --data-dir
 
 ✔ Outputs parquet files
 
-✔ Recovers corrupted parquet files
+✔ Handles corrupted parquet data
 
 ✔ Parses legacy SGX format
 
-✔ Implements Data Vault methodology
+✔ Implements Data Vault modeling
 
-✔ Uses Airflow for orchestration
+✔ Uses Airflow orchestration
 
 ✔ Provides analytics dashboard
 
 ✔ End-to-end reproducible pipeline
 
-13. Demo Flow (For Jury)
-
-Open Airflow UI
-http://<vm-ip>:80
-
-Open Web Pipeline Launcher
-http://<vm-ip>:8090
-
-Enter dataset directory and start pipeline
-
-Show logs:
-
-Parquet recovery
-
-SGX parsing
-
-Data Vault build
-
-Mart publishing
-
-Open Dashboard
-http://<vm-ip>:8080
-
-Present analytical insights
-
-14. Team Information
+👥 Team Information
 
 Team Name: SumBa 101
 
 Hackathon: SOCAR Hackathon 2025
 
 Track: Data Engineering
+
+🎤 Demo Summary (For Jury)
+
+“From a single web interface, we trigger the full ETL pipeline.
+Data flows from raw sources through recovery, parsing, Data Vault modeling, and marts.
+Airflow handles orchestration, and results are instantly visible in the dashboard.”
